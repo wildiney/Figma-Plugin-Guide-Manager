@@ -1,0 +1,22 @@
+{
+  "name": "figma-plugin-guide-manager",
+  "version": "1.0.0",
+  "description": "Figma plugin to manage guides",
+  "main": "code.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json --watch"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@figma/plugin-typings": "*",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
+    "eslint": "^8.16.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "typescript": "*"
+  }
+}
