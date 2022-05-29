@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide Manager</title>
+  <style>
+    html,
+    body {
+      font-size: 16px;
+      background-color: var(--figma-color-bg);
+      color: var(--figma-color-text);
+    }
+
+    .container {
+      padding: .5rem;
+      border-radius: .5rem;
+    }
+
+    h2 {
+      font-family: Inter, sans-serif;
+    }
+
+    .input {
+      margin-bottom: .5rem;
+    }
+
+    .button {
+      border: 1px solid gray;
+      cursor: pointer;
+      border-radius: .3rem;
+      padding: .4rem;
+      font-size: .7rem;
+    }
+
+    .button:hover {
+      background-color: gray;
+    }
+
+    .button:active {
+      background-color: lightblue;
+    }
+
+    .button_icon {
+      padding: .5rem;
+    }
+
+    .button_clear_all {
+      width: 100%;
+      margin: 0 auto;
+      grid-column: 1/5;
+    }
+
+    .input {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: .5rem;
+    }
+
+    input:focus {
+      outline: 1px solid darkgray;
+    }
+
+    input {
+      padding: .3rem;
+      border-radius: .3rem;
+      border: 1px solid gray;
+      width: auto;
+    }
+
+    hr {
+      margin: .5rem 0;
+      border: 1px solid lightgray;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Guide Manager</h2>
+
+    <div class="input">
+      <button class='button button_icon button_clear_all' id="clearAllGuides">Clear All Guides</button>
+    </div>
+    <hr />
+    <div class="input">
+      <input type="text" size="4" class="input__field" id="margins" data-guide="margins" value="16">
+      <button class='button button--primary' id="addMargin">Add Margins</button>
+    </div>
+    <hr />
+    <div class="input">
+      <input type="text" size="4" class="input__field" id="yguide" minlength="1" data-guide="y">
+      <button class='button button--primary' id="movetoy">+ X Guide</button>
+    </div>
+
+    <div class="input">
+      <input type="text" size="4" class="input__field" id="xguide" minlength="1" data-guide="x">
+      <button class='button button--primary' id="movetox">+ Y Guide</button>
+    </div>
+  </div>
+
+  <script>
+    const btnMoveToX = document.getElementById('movetox');
+    const btnMoveToY = document.getElementById('movetoy');
+    const btnClose = document.getElementById('close');
+    const btnAddMargin = document.getElementById('addMargin');
+    const btnClearAllGuides = document.getElementById('clearAllGuides');
+
+    function calculate (id, value) {
+      const newValue = eval(value)
+      return newValue
+    }
+
+    function processValue (elementID) {
+      let element = document.getElementById(elementID);
+      const value = parseInt(eval(element.value));
+      if (value >= 0) {
+        element.value = value;
+      }
+      return value
+    }
+
+    btnAddMargin.addEventListener('click', () => {
+      const value = document.getElementById('margins').value;
+      parent.postMessage({
+        pluginMessage: {
+          type: 'add-margins',
+          data: { marginSize: value }
+        }
+      }, '*');
+    })
+
+    btnMoveToX.addEventListener('click', () => {
+      const value = processValue('xguide');
+      parent.postMessage({
+        pluginMessage: {
+          type: 'add-guides', data: { axis: 'Y', offset: value }
+        }
+      }, '*');
+    });
+
+    btnMoveToY.addEventListener('click', () => {
+      const value = processValue('yguide');
+      parent.postMessage({ pluginMessage: { type: 'add-guides', data: { axis: 'X', offset: value } } }, '*');
+    });
+
+    btnClearAllGuides.addEventListener('click', () => {
+      console.log('clear all guides');
+      parent.postMessage({ pluginMessage: { type: 'clearAllGuides' } }, '*');
+    });
+  </script>
+</body>
+
+</html>
