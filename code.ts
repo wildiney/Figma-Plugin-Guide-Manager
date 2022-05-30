@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 
 const windowWidth = 320
-const windowHeight = 300
+const windowHeight = 353
 
 figma.showUI(__html__, { themeColors: true, width: windowWidth, height: windowHeight })
 
@@ -11,6 +11,8 @@ function addGuides (sel: any, guide: any) {
 }
 
 figma.ui.onmessage = msg => {
+  let value = 0
+
   switch (msg.type) {
     case 'add-guides':
       figma.currentPage.selection.forEach((sel) => {
@@ -61,6 +63,30 @@ figma.ui.onmessage = msg => {
       } else {
         figma.notify('Please select a Frame')
       }
+      break
+    case 'frameWidth':
+      console.log('server frame width')
+      if (figma.currentPage.selection.length > 0) {
+        figma.currentPage.selection.forEach((sel) => {
+          const selection = sel as FrameNode
+          value = selection.width
+        })
+      } else {
+        figma.notify('Please select a Frame')
+      }
+      figma.ui.postMessage({ query: 'inputValue', results: value })
+      break
+    case 'frameHeight':
+      console.log('server frame width')
+      if (figma.currentPage.selection.length > 0) {
+        figma.currentPage.selection.forEach((sel) => {
+          const selection = sel as FrameNode
+          value = selection.height
+        })
+      } else {
+        figma.notify('Please select a Frame')
+      }
+      figma.ui.postMessage({ query: 'inputValue', results: value })
       break
     case 'close':
       figma.closePlugin()
