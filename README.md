@@ -5,4 +5,6 @@
 ![ESLINT](https://img.shields.io/badge/eslint-3A33D1?style=for-the-badge&logo=eslint&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 
+![Guide Manager](https://github.com/wildiney/Figma-Plugin-Guide-Manager/blob/master/assets/cover/plugin-cover.png)
+
 Add guide to the exactly position you want and allow to make calculations inside the input
