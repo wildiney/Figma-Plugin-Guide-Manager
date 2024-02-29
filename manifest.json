@@ -2,9 +2,16 @@
   "name": "Guide Manager",
   "id": "1111678420175165110",
   "api": "1.0.0",
-  "main": "code.js",
   "editorType": [
     "figma"
   ],
-  "ui": "ui.html"
+  "permissions": [],
+  "main": "dist/code.js",
+  "ui": "dist/index.html",
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ]
+  },
+  "documentAccess": "dynamic-page"
 }
