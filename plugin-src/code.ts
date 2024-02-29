@@ -1,7 +1,5 @@
-/* eslint-disable no-undef */
-
-const windowWidth = 320
-const windowHeight = 353
+const windowWidth = 400
+const windowHeight = 642
 
 figma.showUI(__html__, { themeColors: true, width: windowWidth, height: windowHeight })
 
@@ -10,11 +8,22 @@ function addGuides (sel: any, guide: any) {
   selection.guides = selection.guides.concat(guide)
 }
 
+figma.on('selectionchange', () => {
+  const selected = figma.currentPage.selection
+
+  if (selected != undefined && selected.length > 0) {
+    figma.ui.postMessage({ type: 'selectionchange', status: 'selected' })
+    console.log(selected)
+  } else {
+    figma.ui.postMessage({ type: 'selectionchange', status: 'none' })
+  }
+})
+
 figma.ui.onmessage = msg => {
   let value = 0
 
   switch (msg.type) {
-    case 'add-guides':
+    case 'add-guide':
       figma.currentPage.selection.forEach((sel) => {
         console.log(sel)
         const selection = sel as FrameNode
@@ -29,8 +38,11 @@ figma.ui.onmessage = msg => {
       })
       break
     case 'add-margins':
+      if (figma.currentPage.selection.length == 0) {
+        figma.notify("Please select a frame")
+      }
       figma.currentPage.selection.forEach((sel) => {
-        const selection = sel as FrameNode
+        const selection = sel
         const marginSize = parseInt(msg.data.marginSize)
         const height = selection.height
         const width = selection.width
@@ -74,7 +86,7 @@ figma.ui.onmessage = msg => {
       } else {
         figma.notify('Please select a Frame')
       }
-      figma.ui.postMessage({ query: 'inputValue', results: value })
+      figma.ui.postMessage({ query: 'inputValue', width: value })
       break
     case 'frameHeight':
       console.log('server frame width')
@@ -86,7 +98,7 @@ figma.ui.onmessage = msg => {
       } else {
         figma.notify('Please select a Frame')
       }
-      figma.ui.postMessage({ query: 'inputValue', results: value })
+      figma.ui.postMessage({ query: 'inputValue', height: value })
       break
     case 'close':
       figma.closePlugin()

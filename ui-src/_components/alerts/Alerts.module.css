@@ -1,0 +1,27 @@
+.warning {
+  position: fixed;
+  top: .5rem;
+  left: 1.5rem;
+  right: 2rem;
+  width: auto;
+  /* background-color: var(--figma-color-bg-warning); */
+  /* border: 3px solid var(--figma-color-border-warning-strong); */
+  border-radius: 0.25rem;
+  padding: 0;
+}
+
+.warning p {
+  text-align: left;
+  padding: 0.3rem;
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--figma-color-text-inverse);
+  text-transform: uppercase;
+  font-weight: bold;
+  display: flex;
+  gap: .25rem
+}
+
+.warning p img {
+  fill: white
+}
