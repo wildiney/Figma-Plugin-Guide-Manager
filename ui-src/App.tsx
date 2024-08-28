@@ -1,15 +1,15 @@
 import { useRef, useState } from "react";
+import Alerts from "./_components/alerts/Alerts";
+import Button from "./_components/buttons/Button";
+import Footer from "./_components/footer/Footer";
+import Title from "./_components/Titles/Title";
 import "./App.css";
+import AddIcon from "./assets/icons/addIcon";
 import IconClearGuides from "./assets/icons/IconClearGuides";
 import IconGuides from "./assets/icons/IconGuides";
-import IconX from "./assets/icons/IconX";
-import Footer from "./_components/footer/Footer";
-import Button from "./_components/buttons/Button";
-import Title from "./_components/Titles/Title";
-import Alerts from "./_components/alerts/Alerts";
-import IconY from "./assets/icons/IconY";
-import IconWidth from "./assets/icons/IconWidth";
 import IconHeight from "./assets/icons/IconHeight";
+import IconWidth from "./assets/icons/IconWidth";
+
 
 function App () {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -42,7 +42,7 @@ function App () {
       pluginMessage: {
         type: 'add-guide',
         data: {
-          axis: 'X', offset: parseInt(eval(value))
+          axis: 'X', offset: parseInt(value)
         }
       }
     }, "*")
@@ -56,7 +56,7 @@ function App () {
       pluginMessage: {
         type: 'add-guide',
         data: {
-          axis: 'Y', offset: parseInt(eval(value))
+          axis: 'Y', offset: parseInt(value)
         }
       }
     }, "*")
@@ -123,7 +123,8 @@ function App () {
       <div className="dataInsert">
         {isFrameSelected ? <Alerts /> : null}
         <input
-          type="text"
+          type="number"
+          min={0}
           ref={inputRef}
           className="inputValue border-bottom text-center col-4 mb-16"
           placeholder="00" />
@@ -136,8 +137,8 @@ function App () {
         </div>
 
         <div className="flex gap-4">
-          <Button label="X Axis" leftIcon={<IconX />} onClick={addGuideInX} />
-          <Button label="Y Axis" leftIcon={<IconY />} onClick={addGuideInY} />
+          <Button label="Horizontal Guide" leftIcon={<AddIcon />} onClick={addGuideInY} />
+          <Button label="Vertical Guide" leftIcon={<AddIcon />} onClick={addGuideInX} />
         </div>
 
         <Title>Dimensions</Title>
