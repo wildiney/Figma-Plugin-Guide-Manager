@@ -1,4 +1,4 @@
-const windowWidth = 400
+const windowWidth = 340
 const windowHeight = 642
 
 figma.showUI(__html__, { themeColors: true, width: windowWidth, height: windowHeight })
