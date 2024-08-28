@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import reactRefresh from '@vitejs/plugin-react-refresh'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 
@@ -17,5 +17,11 @@ export default defineConfig({
         inlineDynamicImports: true
       }
     }
+  },
+  test: {
+    environment: 'jsdom'
+  },
+  optimizeDeps: {
+    exclude: ['ui-src/assets/icons', 'ui-src/main.tsx']
   }
 })
