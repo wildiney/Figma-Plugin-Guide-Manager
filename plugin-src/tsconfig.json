@@ -8,5 +8,8 @@
     "typeRoots": [
       "../node_modules/@figma"
     ]
-  }
+  },
+  "exclude": [
+    "__tests__"
+  ]
 }
