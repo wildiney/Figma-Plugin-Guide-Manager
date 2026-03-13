@@ -15,7 +15,10 @@
     "build:main": "esbuild plugin-src/code.ts --bundle --outfile=dist/code.js",
     "build:ui": "npx vite build --minify esbuild --emptyOutDir=false",
     "build:watch": "concurrently -n widget,iframe \"npm run build:main -- --watch\" \"npm run build:ui -- --watch\"",
-    "dev": "concurrently -n tsc,build,vite 'npm:tsc:watch' 'npm:build:watch' 'vite'"
+    "dev": "concurrently -n tsc,build,vite 'npm:tsc:watch' 'npm:build:watch' 'vite'",
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -23,9 +26,14 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "*",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/node": "^25.4.0",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/ui": "^1.6.0",
     "concurrently": "^8.2.2",
     "esbuild": "^0.23.1",
     "jsdom": "^25.0.0",
@@ -33,6 +41,7 @@
     "typescript": "^5.5.4",
     "vite": "^5.4.6",
     "vite-plugin-singlefile": "^2.0.2",
-    "vite-svg-loader": "^5.1.0"
+    "vite-svg-loader": "^5.1.0",
+    "vitest": "^1.6.0"
   }
 }
