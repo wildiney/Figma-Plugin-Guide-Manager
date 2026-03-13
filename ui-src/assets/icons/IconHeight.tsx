@@ -1,16 +1,10 @@
-type IconProps = {
-  fill?: string,
-  width?: number,
-  height?: number,
-  strokeColor?: string
-}
-
-const IconHeight: React.FC<IconProps> = ({ fill, strokeColor, width, height }) => {
+const IconHeight = ({ height = 20 }: { height?: number }) => {
   return (
     <svg
-      width={width || 20}
+      height={height}
       viewBox="0 0 16 34"
-      fill={fill || "currentColor"}
+      fill="none"
+      stroke="currentColor"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path

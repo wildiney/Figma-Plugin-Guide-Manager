@@ -10,9 +10,17 @@ export interface MarginData {
   marginSize: string | number
 }
 
+export interface GridData {
+  columns: number
+  rows: number
+  gap: number
+  marginX: number
+  marginY: number
+}
+
 export interface PluginMessage {
-  type: 'add-guide' | 'add-margins' | 'clearAllGuides' | 'frameWidth' | 'frameHeight' | 'close'
-  data?: GuideData | MarginData | any
+  type: 'add-guide' | 'add-margins' | 'add-grid' | 'clearAllGuides' | 'frameWidth' | 'frameHeight' | 'close'
+  data?: GuideData | MarginData | GridData | any
 }
 
 export interface PluginResponse {
@@ -95,6 +103,10 @@ export function usePluginMessage (options: UsePluginMessageOptions = {}) {
     sendMessage({ type: 'frameHeight' });
   }, [sendMessage]);
 
+  const sendGrid = useCallback((data: GridData) => {
+    sendMessage({ type: 'add-grid', data });
+  }, [sendMessage]);
+
   const closePlugin = useCallback(() => {
     sendMessage({ type: 'close' });
   }, [sendMessage]);
@@ -103,6 +115,7 @@ export function usePluginMessage (options: UsePluginMessageOptions = {}) {
     sendMessage,
     addGuide,
     addMargins,
+    sendGrid,
     clearAllGuides,
     getFrameWidth,
     getFrameHeight,

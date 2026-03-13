@@ -4,6 +4,9 @@ import Alerts from "./_components/alerts/Alerts";
 import Button from "./_components/buttons/Button";
 import Footer from "./_components/footer/Footer";
 import Title from "./_components/Titles/Title";
+import TabBar from "./_components/tabs/TabBar";
+import NumberInput from "./_components/inputs/NumberInput";
+import Divider from "./_components/Divider";
 import "./App.css";
 import AddIcon from "./assets/icons/addIcon";
 import IconClearGuides from "./assets/icons/IconClearGuides";
@@ -11,11 +14,24 @@ import IconGuides from "./assets/icons/IconGuides";
 import IconHeight from "./assets/icons/IconHeight";
 import IconWidth from "./assets/icons/IconWidth";
 
+const TABS = [
+  { id: 'guides', label: 'Guides' },
+  { id: 'grid', label: 'Grid' },
+]
 
 function App () {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isFrameSelected, setIsFrameSelected] = useState(true)
+  const [isNoFrameSelected, setIsNoFrameSelected] = useState(true)
   const [inputError, setInputError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'guides' | 'grid'>('guides')
+
+  // Grid form state
+  const [gridColumns, setGridColumns] = useState('12')
+  const [gridRows, setGridRows] = useState('')
+  const [gridGap, setGridGap] = useState('24')
+  const [gridMarginX, setGridMarginX] = useState('0')
+  const [gridMarginY, setGridMarginY] = useState('0')
+  const [gridError, setGridError] = useState<string | null>(null)
 
   const {
     addGuide,
@@ -23,11 +39,12 @@ function App () {
     clearAllGuides: sendClearGuides,
     getFrameWidth,
     getFrameHeight,
+    sendGrid,
   } = usePluginMessage({
     onSelectionChange: (status) => {
-      setIsFrameSelected(status === 'none');
+      setIsNoFrameSelected(status === 'none');
     },
-    onDimensionReceived: (dimension, value) => {
+    onDimensionReceived: (_dimension, value) => {
       if (inputRef.current) {
         inputRef.current.value = value.toString();
       }
@@ -44,12 +61,10 @@ function App () {
     }
 
     setInputError(null);
-    console.log('Add Margins', marginValue)
     sendMargins(marginNum);
   }
 
   const addGuideInX = () => {
-    console.log("Add Guide in X-Axis")
     const value = inputRef.current?.value || '0'
     const offset = parseInt(value, 10);
 
@@ -63,7 +78,6 @@ function App () {
   }
 
   const addGuideInY = () => {
-    console.log("Add Guide in Y-Axis")
     const value = inputRef.current?.value || '0'
     const offset = parseInt(value, 10);
 
@@ -77,17 +91,14 @@ function App () {
   }
 
   const clearAllGuides = () => {
-    console.info('Removing Guides')
     sendClearGuides();
   }
 
   const handleGetWidth = () => {
-    console.log('Get Width')
     getFrameWidth();
   }
 
   const handleGetHeight = () => {
-    console.log('Get Height')
     getFrameHeight();
   }
 
@@ -129,58 +140,104 @@ function App () {
     }
   }
 
+  const handleCreateGrid = () => {
+    const C = gridColumns ? parseInt(gridColumns, 10) : 0
+    const R = gridRows ? parseInt(gridRows, 10) : 0
+    const G = parseInt(gridGap || '0', 10)
+    const MX = parseInt(gridMarginX || '0', 10)
+    const MY = parseInt(gridMarginY || '0', 10)
 
+    if (C === 0 && R === 0) { setGridError('Enter at least columns or rows'); return }
+    if (gridColumns && (isNaN(C) || C < 1)) { setGridError('Columns must be >= 1'); return }
+    if (gridRows && (isNaN(R) || R < 1)) { setGridError('Rows must be >= 1'); return }
+    if (isNaN(G) || G < 0) { setGridError('Gap must be >= 0'); return }
+    if (isNaN(MX) || MX < 0) { setGridError('Margin X must be >= 0'); return }
+    if (isNaN(MY) || MY < 0) { setGridError('Margin Y must be >= 0'); return }
+
+    setGridError(null)
+    sendGrid({ columns: C, rows: R, gap: G, marginX: MX, marginY: MY })
+  }
 
   return (
     <div className="wrapper">
-      <div className="dataInsert">
-        {isFrameSelected ? <Alerts /> : null}
-        {inputError && (
-          <div className="errorMessage" role="alert">
-            {inputError}
-          </div>
+      <div className="header">
+        <TabBar tabs={TABS} activeTab={activeTab} onTabChange={(id) => setActiveTab(id as 'guides' | 'grid')} />
+        <div style={{ visibility: isNoFrameSelected ? 'visible' : 'hidden' }}>
+          <Alerts />
+        </div>
+        {activeTab === 'guides' && (
+          <>
+            {inputError && (
+              <div className="errorMessage" role="alert">{inputError}</div>
+            )}
+            <input
+              type="number"
+              min={0}
+              ref={inputRef}
+              className="inputValue"
+              placeholder="00"
+              aria-label="Offset (px)"
+            />
+          </>
         )}
-        <input
-          type="number"
-          min={0}
-          ref={inputRef}
-          className="inputValue border-bottom text-center col-4 mb-16"
-          placeholder="00"
-          aria-label="Value input"
-          aria-describedby={inputError ? "input-error" : undefined} />
       </div>
-      <div className="flex flex-col gap-4">
 
-        <div className="flex gap-4">
-          <Button label="Clear Guides" leftIcon={<IconClearGuides />} onClick={clearAllGuides} />
-          <Button label="Add Margins" leftIcon={<IconGuides />} onClick={addMargins} />
-        </div>
+      <div className="content flex flex-col gap-3">
+        {activeTab === 'guides' && (
+          <>
+            <div className="flex gap-4">
+              <Button label="Vertical Guide" leftIcon={<AddIcon />} onClick={addGuideInX} />
+              <Button label="Horizontal Guide" leftIcon={<AddIcon />} onClick={addGuideInY} />
+            </div>
+            <div className="flex gap-4">
+              <Button label="Add Margins" leftIcon={<IconGuides />} onClick={addMargins} />
+              <Button label="Clear Guides" leftIcon={<IconClearGuides />} onClick={clearAllGuides} />
+            </div>
 
-        <div className="flex gap-4">
-          <Button label="Horizontal Guide" leftIcon={<AddIcon />} onClick={addGuideInY} />
-          <Button label="Vertical Guide" leftIcon={<AddIcon />} onClick={addGuideInX} />
-        </div>
+            <Divider />
+            <Title>Dimensions</Title>
+            <div className="flex gap-4">
+              <Button label="Width" leftIcon={<IconWidth />} onClick={handleGetWidth} />
+              <Button label="Height" leftIcon={<IconHeight />} onClick={handleGetHeight} />
+            </div>
 
-        <Title>Dimensions</Title>
-        <div className="flex gap-4">
-          <Button label="Get Width" leftIcon={<IconWidth />} onClick={handleGetWidth} />
-          <Button label="Get Height" leftIcon={<IconHeight />} onClick={handleGetHeight} />
-        </div>
+            <Divider />
+            <Title>Calculations 8px</Title>
+            <div className="flex gap-4">
+              <Button label="-4" ariaLabel="Subtract 4px" onClick={() => addValue('-', 4)} />
+              <Button label="+4" ariaLabel="Add 4px" onClick={() => addValue('+', 4)} />
+              <Button label="-8" ariaLabel="Subtract 8px" onClick={() => addValue('-', 8)} />
+              <Button label="+8" ariaLabel="Add 8px" onClick={() => addValue('+', 8)} />
+            </div>
 
-        <Title>Calculations 8px grid</Title>
-        <div className="flex gap-4">
-          <Button label="-4" ariaLabel="Subtract 4 pixels" onClick={() => { addValue('-', 4) }} />
-          <Button label="+4" ariaLabel="Add 4 pixels" onClick={() => { addValue('+', 4) }} />
-          <Button label="-8" ariaLabel="Subtract 8 pixels" onClick={() => { addValue('-', 8) }} />
-          <Button label="+8" ariaLabel="Add 8 pixels" onClick={() => { addValue('+', 8) }} />
-        </div>
-        <Title>Calculations Golden Ratio</Title>
-        <div className="flex gap-4">
-          <Button label="*.38" ariaLabel="Multiply by 0.38" onClick={() => { addValue('*', 0.38) }} />
-          <Button label="*.62" ariaLabel="Multiply by 0.62" onClick={() => { addValue('*', 0.62) }} />
-        </div>
+            <Title>Golden Ratio</Title>
+            <div className="flex gap-4">
+              <Button label="×.38" ariaLabel="Multiply by 0.38" onClick={() => addValue('*', 0.38)} />
+              <Button label="×.62" ariaLabel="Multiply by 0.62" onClick={() => addValue('*', 0.62)} />
+            </div>
+          </>
+        )}
 
+        {activeTab === 'grid' && (
+          <>
+            {gridError && (
+              <div className="errorMessage" role="alert">{gridError}</div>
+            )}
+            <div className="grid-2col">
+              <NumberInput id="grid-columns" label="Columns" value={gridColumns} min={1} placeholder="12" onChange={setGridColumns} />
+              <NumberInput id="grid-rows" label="Rows" value={gridRows} min={1} placeholder="8" onChange={setGridRows} />
+            </div>
+            <NumberInput id="grid-gap" label="Gap (px)" value={gridGap} min={0} placeholder="16" onChange={setGridGap} />
+            <div className="grid-2col">
+              <NumberInput id="grid-margin-x" label="Margin X (px)" value={gridMarginX} min={0} placeholder="80" onChange={setGridMarginX} />
+              <NumberInput id="grid-margin-y" label="Margin Y (px)" value={gridMarginY} min={0} placeholder="40" onChange={setGridMarginY} />
+            </div>
+            <Button label="Create Grid" onClick={handleCreateGrid} />
+            <Button label="Clear Guides" leftIcon={<IconClearGuides />} onClick={clearAllGuides} />
+          </>
+        )}
       </div>
+
       <Footer />
     </div>
   );

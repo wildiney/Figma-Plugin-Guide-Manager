@@ -1,3 +1,5 @@
+import { calculateGridGuides, type GuideData, type GridData } from './gridUtils'
+
 const windowWidth = 360
 const windowHeight = 642
 
@@ -8,18 +10,13 @@ figma.showUI(__html__, {
 })
 
 // Type definitions for message payloads
-interface GuideData {
-  axis: 'X' | 'Y'
-  offset: number
-}
-
 interface MarginData {
   marginSize: string | number
 }
 
 interface PluginMessage {
   type: string
-  data?: GuideData | MarginData | any
+  data?: GuideData | MarginData | GridData | any
 }
 
 export function addGuides (selection: FrameNode, guide: GuideData) {
@@ -70,6 +67,18 @@ function handleAddMargins (selection: FrameNode, marginSize: number) {
   ]
 
   margins.forEach((margin) => addGuides(selection, margin))
+}
+
+function handleAddGrid (selection: FrameNode, data: GridData) {
+  const result = calculateGridGuides(selection.width, selection.height, data)
+
+  if (typeof result === 'string') {
+    figma.notify(result)
+    return
+  }
+
+  selection.guides = selection.guides.concat(result)
+  figma.notify(`Grid created: ${data.columns} cols × ${data.rows} rows`)
 }
 
 function handleClearAllGuides (selection: FrameNode) {
@@ -127,6 +136,16 @@ figma.ui.onmessage = (msg: PluginMessage) => {
         selectedFrames.forEach((selection) =>
           handleAddMargins(selection, marginSize)
         )
+        break
+      }
+
+      case 'add-grid': {
+        if (!msg.data) {
+          figma.notify('Invalid grid data')
+          return
+        }
+        const gridData = msg.data as GridData
+        selectedFrames.forEach((selection) => handleAddGrid(selection, gridData))
         break
       }
 

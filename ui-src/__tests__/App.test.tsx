@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App'
 
@@ -13,14 +13,14 @@ describe('App Component', () => {
 
   it('should render the app with input field', () => {
     render(<App />)
-    const input = screen.getByRole('spinbutton', { name: /value input/i })
+    const input = screen.getByRole('spinbutton', { name: /offset \(px\)/i })
     expect(input).toBeInTheDocument()
     expect(input).toHaveAttribute('type', 'number')
   })
 
   it('should render action buttons', () => {
     render(<App />)
-    expect(screen.getByRole('button', { name: /clear guides/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /clear guides/i })[0]).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /add margins/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /horizontal guide/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /vertical guide/i })).toBeInTheDocument()
@@ -28,10 +28,10 @@ describe('App Component', () => {
 
   it('should render calculation buttons', () => {
     render(<App />)
-    expect(screen.getByRole('button', { name: /subtract 4 pixels/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /add 4 pixels/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /subtract 8 pixels/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /add 8 pixels/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /subtract 4px/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /add 4px/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /subtract 8px/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /add 8px/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /multiply by 0.62/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /multiply by 0.38/i })).toBeInTheDocument()
   })
@@ -40,10 +40,10 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const input = screen.getByRole('spinbutton', { name: /value input/i }) as HTMLInputElement
+    const input = screen.getByRole('spinbutton', { name: /offset \(px\)/i }) as HTMLInputElement
     input.valueAsNumber = 100
 
-    const addButton = screen.getByRole('button', { name: /add 4 pixels/i })
+    const addButton = screen.getByRole('button', { name: /add 4px/i })
     await user.click(addButton)
 
     expect(input.valueAsNumber).toBe(104)
@@ -53,10 +53,10 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const input = screen.getByRole('spinbutton', { name: /value input/i }) as HTMLInputElement
+    const input = screen.getByRole('spinbutton', { name: /offset \(px\)/i }) as HTMLInputElement
     input.valueAsNumber = 100
 
-    const subtractButton = screen.getByRole('button', { name: /subtract 4 pixels/i })
+    const subtractButton = screen.getByRole('button', { name: /subtract 4px/i })
     await user.click(subtractButton)
 
     expect(input.valueAsNumber).toBe(96)
@@ -66,7 +66,7 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const input = screen.getByRole('spinbutton', { name: /value input/i }) as HTMLInputElement
+    const input = screen.getByRole('spinbutton', { name: /offset \(px\)/i }) as HTMLInputElement
     input.valueAsNumber = 100
 
     const multiplyButton = screen.getByRole('button', { name: /multiply by 0.62/i })
@@ -79,10 +79,10 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const input = screen.getByRole('spinbutton', { name: /value input/i }) as HTMLInputElement
+    const input = screen.getByRole('spinbutton', { name: /offset \(px\)/i }) as HTMLInputElement
     input.valueAsNumber = 2
 
-    const subtractButton = screen.getByRole('button', { name: /subtract 4 pixels/i })
+    const subtractButton = screen.getByRole('button', { name: /subtract 4px/i })
     await user.click(subtractButton)
 
     expect(input.valueAsNumber).toBe(0)
@@ -92,7 +92,7 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const input = screen.getByRole('spinbutton', { name: /value input/i }) as HTMLInputElement
+    const input = screen.getByRole('spinbutton', { name: /offset \(px\)/i }) as HTMLInputElement
     input.valueAsNumber = 50
 
     const addGuideButton = screen.getByRole('button', { name: /horizontal guide/i })
@@ -100,9 +100,7 @@ describe('App Component', () => {
 
     expect(global.parent.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({
-        pluginMessage: expect.objectContaining({
-          type: 'add-guide'
-        })
+        pluginMessage: expect.objectContaining({ type: 'add-guide' })
       }),
       '*'
     )
@@ -112,17 +110,15 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const input = screen.getByRole('spinbutton', { name: /value input/i }) as HTMLInputElement
+    const input = screen.getByRole('spinbutton', { name: /offset \(px\)/i }) as HTMLInputElement
     input.valueAsNumber = 16
 
-    const addMarginsButton = screen.getByRole('button', { name: /add margins/i })
-    await user.click(addMarginsButton)
+    const addMargensButton = screen.getByRole('button', { name: /add margins/i })
+    await user.click(addMargensButton)
 
     expect(global.parent.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({
-        pluginMessage: expect.objectContaining({
-          type: 'add-margins'
-        })
+        pluginMessage: expect.objectContaining({ type: 'add-margins' })
       }),
       '*'
     )
@@ -132,14 +128,12 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const clearButton = screen.getByRole('button', { name: /clear guides/i })
-    await user.click(clearButton)
+    const clearButtons = screen.getAllByRole('button', { name: /clear guides/i })
+    await user.click(clearButtons[0])
 
     expect(global.parent.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({
-        pluginMessage: expect.objectContaining({
-          type: 'clearAllGuides'
-        })
+        pluginMessage: expect.objectContaining({ type: 'clearAllGuides' })
       }),
       '*'
     )
@@ -149,14 +143,12 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const getWidthButton = screen.getByRole('button', { name: /get width/i })
+    const getWidthButton = screen.getByRole('button', { name: /width/i })
     await user.click(getWidthButton)
 
     expect(global.parent.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({
-        pluginMessage: expect.objectContaining({
-          type: 'frameWidth'
-        })
+        pluginMessage: expect.objectContaining({ type: 'frameWidth' })
       }),
       '*'
     )
@@ -166,17 +158,47 @@ describe('App Component', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const getHeightButton = screen.getByRole('button', { name: /get height/i })
+    const getHeightButton = screen.getByRole('button', { name: /height/i })
     await user.click(getHeightButton)
 
     expect(global.parent.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({
-        pluginMessage: expect.objectContaining({
-          type: 'frameHeight'
-        })
+        pluginMessage: expect.objectContaining({ type: 'frameHeight' })
+      }),
+      '*'
+    )
+  })
+
+  it('should render the Grid tab and switch to it', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const gridTab = screen.getByRole('tab', { name: /grid/i })
+    await user.click(gridTab)
+
+    expect(screen.getByLabelText(/columns/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/rows/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /create grid/i })).toBeInTheDocument()
+  })
+
+  it('should send postMessage on create grid', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const gridTab = screen.getByRole('tab', { name: /grid/i })
+    await user.click(gridTab)
+
+    // columns defaults to '12', just add rows
+    await user.type(screen.getByLabelText(/rows/i), '8')
+
+    const createGridButton = screen.getByRole('button', { name: /create grid/i })
+    await user.click(createGridButton)
+
+    expect(global.parent.postMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pluginMessage: expect.objectContaining({ type: 'add-grid' })
       }),
       '*'
     )
   })
 })
-
