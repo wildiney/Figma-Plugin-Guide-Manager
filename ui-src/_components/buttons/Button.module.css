@@ -12,6 +12,11 @@
   width: 100%;
   font-size: 0.875rem;
   min-height: 2.5rem;
+  transition:
+    background-color 0.15s ease,
+    outline 0.15s ease;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 .btn:hover {
@@ -34,6 +39,7 @@
 }
 
 .btn:focus-visible {
-  border: none;
+  border-color: var(--color-border-focus);
   outline-color: var(--color-border-focus);
+  outline-width: 2px;
 }
