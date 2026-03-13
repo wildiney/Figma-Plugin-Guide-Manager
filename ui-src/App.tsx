@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { usePluginMessage } from "./hooks/usePluginMessage";
 import Alerts from "./_components/alerts/Alerts";
 import Button from "./_components/buttons/Button";
 import Footer from "./_components/footer/Footer";
@@ -14,105 +15,117 @@ import IconWidth from "./assets/icons/IconWidth";
 function App () {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFrameSelected, setIsFrameSelected] = useState(true)
+  const [inputError, setInputError] = useState<string | null>(null);
 
-  onmessage = (event) => {
-    if (event.data.pluginMessage.status == 'selected') {
-      setIsFrameSelected(false)
-    } else {
-      setIsFrameSelected(true)
+  const {
+    addGuide,
+    addMargins: sendMargins,
+    clearAllGuides: sendClearGuides,
+    getFrameWidth,
+    getFrameHeight,
+  } = usePluginMessage({
+    onSelectionChange: (status) => {
+      setIsFrameSelected(status === 'none');
+    },
+    onDimensionReceived: (dimension, value) => {
+      if (inputRef.current) {
+        inputRef.current.value = value.toString();
+      }
     }
-  }
+  });
 
   const addMargins = () => {
-    const marginValue = inputRef.current?.value || 0
+    const marginValue = inputRef.current?.value || '0'
+    const marginNum = parseInt(marginValue, 10);
+
+    if (isNaN(marginNum) || marginNum < 0) {
+      setInputError('Please enter a valid positive number');
+      return;
+    }
+
+    setInputError(null);
     console.log('Add Margins', marginValue)
-    parent.postMessage({
-      pluginMessage: {
-        type: 'add-margins',
-        data: { marginSize: marginValue }
-      }
-    }, "*")
+    sendMargins(marginNum);
   }
 
   const addGuideInX = () => {
     console.log("Add Guide in X-Axis")
     const value = inputRef.current?.value || '0'
+    const offset = parseInt(value, 10);
 
-    parent.postMessage({
-      pluginMessage: {
-        type: 'add-guide',
-        data: {
-          axis: 'X', offset: parseInt(value)
-        }
-      }
-    }, "*")
+    if (isNaN(offset) || offset < 0) {
+      setInputError('Please enter a valid positive number');
+      return;
+    }
+
+    setInputError(null);
+    addGuide('X', offset);
   }
 
   const addGuideInY = () => {
     console.log("Add Guide in Y-Axis")
     const value = inputRef.current?.value || '0'
+    const offset = parseInt(value, 10);
 
-    parent.postMessage({
-      pluginMessage: {
-        type: 'add-guide',
-        data: {
-          axis: 'Y', offset: parseInt(value)
-        }
-      }
-    }, "*")
+    if (isNaN(offset) || offset < 0) {
+      setInputError('Please enter a valid positive number');
+      return;
+    }
+
+    setInputError(null);
+    addGuide('Y', offset);
   }
 
   const clearAllGuides = () => {
     console.info('Removing Guides')
-    parent.postMessage({ pluginMessage: { type: 'clearAllGuides' } }, "*")
+    sendClearGuides();
   }
 
-  const getWidth = () => {
+  const handleGetWidth = () => {
     console.log('Get Width')
-    parent.postMessage({ pluginMessage: { type: 'frameWidth' } }, "*")
-    onmessage = (event) => {
-      if (inputRef.current !== null) {
-        inputRef.current.value = event.data.pluginMessage.width
-      }
-    }
+    getFrameWidth();
   }
 
-  const getHeight = () => {
+  const handleGetHeight = () => {
     console.log('Get Height')
-    parent.postMessage({ pluginMessage: { type: 'frameHeight' } }, "*")
-    onmessage = (event) => {
-      if (inputRef.current !== null) {
-        inputRef.current.value = event.data.pluginMessage.height
-      }
-    }
+    getFrameHeight();
   }
 
   const addValue = (signal: string, value: number) => {
     const inputValue = inputRef.current?.value || '0'
+    const numValue = parseInt(inputValue, 10);
 
-    let newValue
+    if (isNaN(numValue)) {
+      setInputError('Invalid input value');
+      return;
+    }
+
+    let newValue;
     switch (signal) {
       case "-":
-        newValue = parseInt(inputValue) - value
-        if (inputRef.current == null) return
-        newValue >= 0 ? inputRef.current.value = newValue.toString() : inputRef.current.value = '0'
+        newValue = numValue - value
         break
       case "+":
-        newValue = parseInt(inputValue) + value
-        if (inputRef.current == null) return
-        newValue >= 0 ? inputRef.current.value = newValue.toString() : inputRef.current.value = '0'
+        newValue = numValue + value
         break
       case "*":
-        newValue = Math.round(parseInt(inputValue) * value)
-        if (inputRef.current == null) return
-        newValue >= 0 ? inputRef.current.value = newValue.toString() : inputRef.current.value = '0'
+        newValue = Math.round(numValue * value)
         break
       case "/":
-        newValue = Math.round(parseInt(inputValue) + value)
-        if (inputRef.current == null) return
-        newValue >= 0 ? inputRef.current.value = newValue.toString() : inputRef.current.value = '0'
+        if (value === 0) {
+          setInputError('Cannot divide by zero');
+          return;
+        }
+        newValue = Math.round(numValue / value)
         break
+      default:
+        return;
+    }
 
+    if (inputRef.current !== null) {
+      const finalValue = newValue >= 0 ? newValue : 0;
+      inputRef.current.value = finalValue.toString();
+      setInputError(null);
     }
   }
 
@@ -122,12 +135,19 @@ function App () {
     <div className="wrapper">
       <div className="dataInsert">
         {isFrameSelected ? <Alerts /> : null}
+        {inputError && (
+          <div className="errorMessage" role="alert">
+            {inputError}
+          </div>
+        )}
         <input
           type="number"
           min={0}
           ref={inputRef}
           className="inputValue border-bottom text-center col-4 mb-16"
-          placeholder="00" />
+          placeholder="00"
+          aria-label="Value input"
+          aria-describedby={inputError ? "input-error" : undefined} />
       </div>
       <div className="flex flex-col gap-4">
 
@@ -143,21 +163,21 @@ function App () {
 
         <Title>Dimensions</Title>
         <div className="flex gap-4">
-          <Button label="Get Width" leftIcon={<IconWidth />} onClick={getWidth} />
-          <Button label="Get Height" leftIcon={<IconHeight />} onClick={getHeight} />
+          <Button label="Get Width" leftIcon={<IconWidth />} onClick={handleGetWidth} />
+          <Button label="Get Height" leftIcon={<IconHeight />} onClick={handleGetHeight} />
         </div>
 
         <Title>Calculations 8px grid</Title>
         <div className="flex gap-4">
-          <Button label="-4" onClick={() => { addValue('-', 4) }} />
-          <Button label="+4" onClick={() => { addValue('+', 4) }} />
-          <Button label="-8" onClick={() => { addValue('-', 8) }} />
-          <Button label="+8" onClick={() => { addValue('+', 8) }} />
+          <Button label="-4" ariaLabel="Subtract 4 pixels" onClick={() => { addValue('-', 4) }} />
+          <Button label="+4" ariaLabel="Add 4 pixels" onClick={() => { addValue('+', 4) }} />
+          <Button label="-8" ariaLabel="Subtract 8 pixels" onClick={() => { addValue('-', 8) }} />
+          <Button label="+8" ariaLabel="Add 8 pixels" onClick={() => { addValue('+', 8) }} />
         </div>
         <Title>Calculations Golden Ratio</Title>
         <div className="flex gap-4">
-          <Button label="*.38" onClick={() => { addValue('*', 0.38) }} />
-          <Button label="*.62" onClick={() => { addValue('*', 0.62) }} />
+          <Button label="*.38" ariaLabel="Multiply by 0.38" onClick={() => { addValue('*', 0.38) }} />
+          <Button label="*.62" ariaLabel="Multiply by 0.62" onClick={() => { addValue('*', 0.62) }} />
         </div>
 
       </div>
