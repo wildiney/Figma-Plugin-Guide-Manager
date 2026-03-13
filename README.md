@@ -7,15 +7,25 @@
 
 ![Guide Manager](https://github.com/wildiney/Figma-Plugin-Guide-Manager/blob/master/ui-src/assets/cover/plugin-cover.png)
 
-Add guides to the exact positions you want and perform calculations within the input field.
+Add guides to the exact positions you want, perform calculations within the input field, and generate complete column/row grids using native Figma guides.
 
 ## Features
+
+### Guides tab
 
 - **Add Custom Guides**: Create vertical and horizontal guides at precise positions
 - **Add Margin Guides**: Automatically create guides for frame margins
 - **Clear Guides**: Remove all guides from selected frames with one click
 - **Frame Dimensions**: Query width and height of selected frames
-- **Grid Calculations**: Built-in support for 8px grid and golden ratio calculations
+- **8px Grid Calculations**: Add or subtract 4px/8px increments directly in the input
+- **Golden Ratio**: Multiply by 0.38 or 0.62 for proportional spacing
+
+### Grid tab
+
+- **Column Grid**: Generate guides for any number of columns with configurable gap and horizontal margins
+- **Row Grid**: Generate guides for any number of rows with configurable gap and vertical margins
+- **Full Grid**: Combine columns and rows in a single operation
+- Each column and row is delimited by two guides (left/right or top/bottom edges), making gaps clearly visible
 
 ## API Limitations
 
