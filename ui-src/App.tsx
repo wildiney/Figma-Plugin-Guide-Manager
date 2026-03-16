@@ -214,6 +214,8 @@ function App () {
             <div className="flex gap-4">
               <Button label="×.38" ariaLabel="Multiply by 0.38" onClick={() => addValue('*', 0.38)} />
               <Button label="×.62" ariaLabel="Multiply by 0.62" onClick={() => addValue('*', 0.62)} />
+              <Button label="×1.36" ariaLabel="Multiply by 1.36" onClick={() => addValue('*', 1.36)} />
+              <Button label="×1.62" ariaLabel="Multiply by 1.62" onClick={() => addValue('*', 1.62)} />
             </div>
           </>
         )}

@@ -21,7 +21,8 @@ interface PluginMessage {
 
 export function addGuides (selection: FrameNode, guide: GuideData) {
   try {
-    selection.guides = selection.guides.concat(guide)
+    const { axis, offset } = guide
+    selection.guides = selection.guides.concat({ axis, offset })
   } catch (error) {
     figma.notify('Error adding guide')
     console.error('Failed to add guide:', error)
